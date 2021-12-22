@@ -36,4 +36,22 @@ app.post('/api/login', (req, res) => {
 
 });
 
+function authenticateJWT(req, res, next) {
+  const authHeader = req.headers['authorization']
+  //console.log("HERE : " + authHeader)
+  const token = authHeader && authHeader.split(' ')[1]
+
+  if (token == null) return res.sendStatus(401)
+
+  jwt.verify(token, process.env.SECRET_ACCESS_TOKEN, (err, user) => {
+    if (err) {
+      return res.sendStatus(401)
+    }
+    req.user = user;
+    next();
+  });
+}
+app.get('/api/me', authenticateJWT, (req, res) => {
+  res.send(req.user);
+});
 app.listen(3000, () => console.log('Server running on port 3000!'));
