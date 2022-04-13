@@ -1,4 +1,5 @@
 #include "Types.ligo"
+#include "Error.ligo"
 
 function setAdmin(const admin : address; var s : storage) : return is
 block {
@@ -13,8 +14,8 @@ block {
     if Big_map.mem(s.counter, s.users) then failwith(already_exists)
     else skip;
     s.users := Big_map.add(s.counter, user, s.users);
-    s.registeredAddress := Set.add(user.address, s.registeredAddress)
-    s.counter := s.counter + 1;
+    s.registeredAddress := Set.add(user.address, s.registeredAddress);
+    s.counter := s.counter + 1n;
     
 } with (noOperations, s)
 
