@@ -21,3 +21,4 @@ type return is list(operation) * storage;
 type action is 
   | SetAdmin of address
   | RegisterUser of user
+  
