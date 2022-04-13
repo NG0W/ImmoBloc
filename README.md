@@ -17,6 +17,10 @@ Base déploiement et smart-contrat : Helder
 
 Une fois ces 3 bases faites chacunes des parties prenantes feront monter en compétences les deux afin que par la suite chacun puisse développer une feature de bout en bout.
 
+## Compilation
+
+sudo docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:0.40.0 compile contract Main.ligo --michelson-format json > Main.json
+
 ## License
 
 GNU Affero General Public License, abrégée AGPL, est une licence libre copyleft, ayant pour but d'obliger les services accessibles par le réseau de publier leur code source.
