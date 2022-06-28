@@ -77,6 +77,25 @@ block {
     
 } with (noOperations, s)
 
+[@view] function isApprovedForAll (const params : set_approval_params; const s : storage) : bool is 
+    block {
+        var operator_rights : map(address, map(nat, bool)) := case Big_map.find_opt(Tezos.sender, s.operator_approvals) of [
+        | Some (rights) -> rights
+        | None -> failwith("There's no rights on this NFT")
+        ];
+
+        var list_rights : map(nat, bool) := case Map.find_opt(params.operator, operator_rights) of [
+            | Some(right) -> right
+            | None -> failwith("You do not have rights")
+        ];
+
+        var get_right : bool := case Map.find_opt(params.token_id, list_rights) of [
+            | Some(right) -> right
+        | None -> failwith("Non-existing rights")
+        ];
+        
+    }with (get_right)
+
 function setApprovalForAll(const params : set_approval_params; var s: storage) : return is 
 block{
     if Tezos.sender =/= params.operator then skip else failwith("You shouldn't approve your self");
@@ -113,6 +132,7 @@ block{
     
 } with (noOperations, s)
 
+
 function transferFrom(const params : transfer_from_params; var s : storage) : return is 
 block{
     var balances : map(address, nat) := case Big_map.find_opt(params.token_id, s.balance) of [
@@ -144,10 +164,12 @@ type action is
   | Mint of unit
   | Burn of token_id
   | TransferFrom of transfer_from_params
+  | SetApproval of set_approval_params
 
   function main(const action : action; const s : storage) : return is
   case action of [
     | Mint     -> mint(unit, s)
     | Burn(id) -> burn(id, s)
     | TransferFrom(params) -> transferFrom(params, s)
+    | SetApproval(params) -> setApprovalForAll(params, s)
   ]
