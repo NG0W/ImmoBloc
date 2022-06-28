@@ -21,6 +21,19 @@ Une fois ces 3 bases faites chacunes des parties prenantes feront monter en comp
 
 sudo docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:0.40.0 compile contract Main.ligo --michelson-format json > Main.json
 
+Nous resterons sur cette version par soucis de sécurité
+
+## Deploiement
+> Avoir rempli au préalable un fichier .env à mettre dans le dossier deploy/ selon cette forme
+
+PK=esdk... (Mettez votre private key, récupérable dans Temple wallet)
+RPC=https://jakartanet.tezos.marigold.dev/
+
+Ensuite, depuis la racine du dossier Immoblock : 
+
+```
+ts-node deploy/deploy.ts
+```
 ## License
 
 GNU Affero General Public License, abrégée AGPL, est une licence libre copyleft, ayant pour but d'obliger les services accessibles par le réseau de publier leur code source.
@@ -28,3 +41,5 @@ GNU Affero General Public License, abrégée AGPL, est une licence libre copylef
 Basée sur la licence GNU GPL, dans le cadre général du projet GNU, elle répond à un besoin spécifique du projet Affero, qui souhaite que tout opérateur d'un service Web utilisant leur logiciel et l'améliorant publie ses modifications.
 
 ![License overview](https://snyk.io/wp-content/uploads/Licenses-image-2048x1202.png)
+
+
