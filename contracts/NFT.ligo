@@ -111,28 +111,30 @@ block {
     // else s.operator_approvals[Tezos.sender][params.addr][params.token_id] := True
 // } with (noOperations, s)
 
-// function transferFrom(const params : transfer_from_params; var s : storage) : return is 
-// block{
-//     var balances : map(address, nat) := case Big_map.find_opt(params.token_id, s.balance) of [
-//     | Some (bal) -> bal
-//     | None -> failwith("You're trying to be send an unexisting NFT")
-//     ];
+function transferFrom(const params : transfer_from_params; var s : storage) : return is 
+block{
+    var balances : map(address, nat) := case Big_map.find_opt(params.token_id, s.balance) of [
+    | Some (bal) -> bal
+    | None -> failwith("You're trying to be send an unexisting NFT")
+    ];
 
-//      var user_balance : nat := case Map.find_opt(Tezos.sender, balances) of [
-//     | Some (bal) -> bal
-//     | None -> failwith("You don't own the NFT")
-//     ]; 
+     var user_balance : nat := case Map.find_opt(Tezos.sender, balances) of [
+    | Some (bal) -> bal
+    | None -> failwith("You don't own the NFT")
+    ]; 
 
-//     var balance_map : map(address, nat) := if user_balance = 1n 
-//     then 
-//         Map.update(Tezos.sender, Some(0n), balances);
-//         Map.update(params._to, Some(1n), balances);
+    var updated_balance_map : map(address, nat) := if user_balance = 1n 
+    then 
+    var new_map = Map.update(Tezos.sender, 0, balance_map);
+    //Map.update(params._to, 1, balance_map);
+    // patch balance_map with map[
+        
+    //     Tezos.sender -> Some(0n); 
+    //     params._to -> Some(1n)];
 
-//     else failwith("You don't have enough balance");
+    s.balance[id] := updated_balance_map;
 
-//     s.balance[id] := updated_balance_map;
-
-// } with (noOperations, s)
+} with (noOperations, s)
 
 type action is 
   | Mint of unit
