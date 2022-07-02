@@ -27,6 +27,7 @@ type set_approval_params is record[
 ]
 
 type transfer_from_params is record[
+    _from: address;
     _to: address;
     token_id: nat;
 ]
@@ -61,7 +62,7 @@ type return is list(operation) * storage;
 (* Returns a boolean if the operator is approved *)
 [@view] function isApprovedForAll (const params : set_approval_params; const s : storage) : bool is 
     block {
-
+        
         // We unpack one by one each nested map
         var operator_rights : map(address, map(nat, bool)) := case Big_map.find_opt(Tezos.sender, s.operator_approvals) of [
         | Some (rights) -> rights
@@ -137,18 +138,35 @@ block{
     // Rétourne l'adresse est bien owner
     var is_owner := isOwner(params, s);
         
-    if is_owner then skip;
+    if is_owner = True then skip else failwith("Not owner");
 
+    const nested_map : map(nat, bool) = map [
+        params.token_id -> True
+    ];
+
+    const operator : map(address, map(nat, bool)) = map [
+         params.operator -> nested_map
+     ];
+     
+    const added_item : operator_approvals = Map.add (Tezos.sender, operator, s.operator_approvals);
+    s.operator_approvals := added_item
     // Rétourne un booléen pour savoir si le droit existe 
-    var get_right : bool := isApprovedForAll(params, s);
-    if get_right = True then failwith("You already have the right")
-    else s.operator_approvals[Tezos.sender][params.operator][params.token_id] := True
+    // var get_right : bool := isApprovedForAll(params, s);
+    // if get_right = True then failwith("You already have the right")
+    
     
 } with (noOperations, s)
 
 (* Permet de transferer un token à une autre adresse ou à transfer un token où nous sommes approuvés *)
 function transferFrom(const params : transfer_from_params; var s : storage) : return is 
 block{
+
+    const approval_params = record[
+        operator = params._from;
+        token_id = params.token_id;
+    ];
+
+    if Tezos.sender = params._from or isApprovedForAll(approval_params, s) then skip else failwith("You can't use this NFT");
     // On récupère le ledger pour pouvoir le modifier ensuite
     var balances : map(address, nat) := case Big_map.find_opt(params.token_id, s.balance) of [
     | Some (bal) -> bal
@@ -156,7 +174,7 @@ block{
     ];
 
      // On récupère la balance du user concerné
-     var user_balance : nat := case Map.find_opt(Tezos.sender, balances) of [
+     var user_balance : nat := case Map.find_opt(params._from, balances) of [
     | Some (bal) -> bal
     | None -> failwith("You don't own the NFT")
     ]; 
@@ -164,7 +182,7 @@ block{
     // Met à 0 la balance de l'expéditeur
     var updated_balance_map : map(address, nat) := if user_balance = 1n 
     then 
-    Map.update(Tezos.sender, Some(0n), balances)
+    Map.update(params._from, Some(0n), balances)
     else failwith("You don't own the NFT II");
 
     // Met à 1 la balance du receveur
