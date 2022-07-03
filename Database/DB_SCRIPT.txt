@@ -1,149 +1,66 @@
--- *** SqlDBM: POSTGRES ****************
--- *** *********************************
+CREATE DATABASE IF NOT EXISTS "ImmoBloc";
 
-CREATE DATABASE `ImmoBloc`
-USE `ImmoBloc`
-
--- *** ********************* `agencies`
-
-CREATE TABLE agencies
+CREATE TABLE IF NOT EXISTS public.agencies
 (
- id   integer NOT NULL ,
- name varchar(45) NOT NULL ,
- code varchar(45) NULL ,
-
-PRIMARY KEY (id)
+    id integer NOT NULL,
+    name character varying(45) COLLATE pg_catalog."default" NOT NULL,
+    code character varying(45) COLLATE pg_catalog."default",
+    CONSTRAINT agencies_pkey PRIMARY KEY (id)
 );
 
--- *** ********************* `assets`
-
-CREATE TABLE assets
+CREATE TABLE IF NOT EXISTS public.assets
 (
- id          integer NOT NULL ,
- name        varchar(45) NOT NULL ,
- id_agency   integer NOT NULL ,
- id_status   integer NOT NULL ,
- value       integer NOT NULL ,
- max_refunds integer NOT NULL ,
-
-PRIMARY KEY (id)
-CREATE INDEX FK_01 ON assets (id_agency),
-CONSTRAINT CS_01 FOREIGN KEY `FK_01` (id_agency) REFERENCES `agencies` (id),
-KEY `FK_02` (id_status),
-CONSTRAINT CS_02 FOREIGN KEY `FK_02` (id_status) REFERENCES `status_assets` (id)
+    id integer NOT NULL,
+    name character varying(45) COLLATE pg_catalog."default" NOT NULL,
+    id_agency integer NOT NULL,
+    id_status integer NOT NULL,
+    value integer NOT NULL,
+    max_refunds integer NOT NULL,
+    CONSTRAINT assets_pkey PRIMARY KEY (id)
 );
 
--- *** ********************* `documents`
-
-CREATE TABLE documents
+CREATE TABLE IF NOT EXISTS public.documents
 (
- id       integer NOT NULL ,
- id_asset integer NOT NULL ,
- name     varchar(45) NOT NULL ,
-
-PRIMARY KEY (id)
-CREATE INDEX FK_03 ON documents (id_asset),
-CONSTRAINT CS_03 FOREIGN KEY `FK_03` (id_asset) REFERENCES `assets` (id)
+    id integer NOT NULL,
+    id_asset integer NOT NULL,
+    name character varying(45) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT documents_pkey PRIMARY KEY (id)
 );
 
--- *** ********************* `offers`
-
-CREATE TABLE offers
+CREATE TABLE IF NOT EXISTS public.offers
 (
- id        integer NOT NULL ,
- id_user   integer NOT NULL ,
- id_asset  integer NOT NULL ,
- id_status integer NOT NULL ,
- value     integer NOT NULL ,
-
-PRIMARY KEY (id)
-CREATE INDEX FK_04 ON offers (id_user),
-CONSTRAINT CS_04 FOREIGN KEY `FK_04` (id_user) REFERENCES `users` (id),
-KEY `FK_05` (id_asset),
-CONSTRAINT CS_05 FOREIGN KEY `FK_05` (id_asset) REFERENCES `assets` (id),
-KEY `FK_06` (id_status),
-CONSTRAINT CS_06 FOREIGN KEY `FK_06` (id_status) REFERENCES `status_offers` (id)
+    id integer NOT NULL,
+    id_user integer NOT NULL,
+    id_asset integer NOT NULL,
+    id_status integer NOT NULL,
+    value integer NOT NULL,
+    CONSTRAINT offers_pkey PRIMARY KEY (id)
 );
 
--- *** ********************* `payments`
-
-CREATE TABLE payments
+CREATE TABLE IF NOT EXISTS public.payments
 (
- id        integer NOT NULL ,
- name      varchar(45) NULL ,
- id_status integer NOT NULL ,
- id_asset  integer NOT NULL ,
- id_user   integer NOT NULL ,
- value     integer NOT NULL ,
- due_date  date NOT NULL ,
-
-PRIMARY KEY (id)
-CREATE INDEX FK_07 ON payments (id_status),
-CONSTRAINT CS_07 FOREIGN KEY `FK_07` (id_status) REFERENCES `status_payments` (id),
-KEY `FK_08` (id_user),
-CONSTRAINT CS_08 FOREIGN KEY `FK_08` (id_user) REFERENCES `users` (id),
-KEY `FK_09` (id_asset),
-CONSTRAINT CS_09 FOREIGN KEY `FK_09` (id_asset) REFERENCES `assets` (id)
+    id integer NOT NULL,
+    name character varying(45) COLLATE pg_catalog."default",
+    id_status integer NOT NULL,
+    id_asset integer NOT NULL,
+    id_user integer NOT NULL,
+    value integer NOT NULL,
+    due_date date NOT NULL,
+    CONSTRAINT payments_pkey PRIMARY KEY (id)
 );
 
--- *** ********************* `status_assets`
-
-CREATE TABLE status_assets
+CREATE TABLE IF NOT EXISTS public.users
 (
- id   integer NOT NULL ,
- name varchar(45) NOT NULL ,
-
-PRIMARY KEY (id)
-);
-
--- *** ********************* `status_offers`
-
-CREATE TABLE status_offers
-(
- id   integer NOT NULL ,
- name varchar(45) NOT NULL ,
-
-PRIMARY KEY (id)
-);
-
--- *** ********************* `status_payments`
-
-CREATE TABLE status_payments
-(
- id   integer NOT NULL ,
- name varchar(45) NOT NULL ,
-
-PRIMARY KEY (id)
-);
-
--- *** ********************* `status_users`
-
-CREATE TABLE status_users
-(
- id   integer NOT NULL ,
- name varchar(45) NOT NULL ,
-
-PRIMARY KEY (id)
-);
-
--- *** ********************* `users`
-
-CREATE TABLE users
-(
- id           integer NOT NULL ,
- id_status    integer NOT NULL ,
- id_agency    integer NULL ,
- name         varchar(45) NOT NULL ,
- surname      varchar(45) NOT NULL ,
- mail         varchar(45) NOT NULL ,
- age          date NULL ,
- address      varchar(45) NULL ,
- salary       integer NOT NULL ,
- contrat_type integer NOT NULL ,
-
-PRIMARY KEY (id)
-CREATE INDEX FK_10 ON users (id_status),
-CONSTRAINT CS_10 FOREIGN KEY `FK_10` (id_status) REFERENCES `status_users` (id),
-KEY `FK_10` (id_agency),
-CONSTRAINT CS_10 FOREIGN KEY `FK_10` (id_agency) REFERENCES `agencies` (id)
+    id integer NOT NULL,
+    id_status integer NOT NULL,
+    id_agency integer,
+    name character varying(45) COLLATE pg_catalog."default" NOT NULL,
+    surname character varying(45) COLLATE pg_catalog."default" NOT NULL,
+    mail character varying(45) COLLATE pg_catalog."default" NOT NULL,
+    age date,
+    address character varying(45) COLLATE pg_catalog."default",
+    salary integer NOT NULL,
+    contrat_type integer NOT NULL,
+    validated boolean NOT NULL DEFAULT false,
+    CONSTRAINT users_pkey PRIMARY KEY (id)
 );
