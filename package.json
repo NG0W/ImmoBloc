@@ -1,5 +1,5 @@
 {
-  "name": "ligopa",
+  "name": "immobloc",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NG0W/LigoPA.git"
+    "url": "git+https://github.com/NG0W/ImmoBloc.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/NG0W/LigoPA/issues"
+    "url": "https://github.com/NG0W/ImmoBloc/issues"
   },
-  "homepage": "https://github.com/NG0W/LigoPA#readme"
+  "homepage": "https://github.com/NG0W/ImmoBloc#readme"
 }
