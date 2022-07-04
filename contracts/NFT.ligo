@@ -1,25 +1,21 @@
 type token_id is nat
 
 // nat(=token id) --> address(=user) --> nat(=balance)
-type balance is big_map(token_id, map(address, nat))
+type balance is map(token_id, map(address, nat))
 
 // nat(=token id) --> string(=link to ipfs)
-type uris is big_map(token_id, string)
+type uris is map(token_id, string)
 
 // address(=holder) -->  address(=operator) --> nat(=id nft) --> bool(=allow/deny)
-type operator_approvals is big_map(address, map(address, map(nat, bool)))
+type operator_approvals is map(address, map(address, map(nat, bool)))
 
 type storage is record [
     balance: balance;
     operator_approvals: operator_approvals;
     uris: uris;
     counter: nat;
+    agents: map(nat, )
 ]
-
-// type balance_of_param is record [
-//     addr: address;
-//     token_id: token_id;
-// ]
 
 type set_approval_params is record[
     operator: address;
@@ -42,7 +38,7 @@ type return is list(operation) * storage;
 (* Returns a bool as true if the given address is owner of the NFT *)
 [@view] function isOwner (const params : set_approval_params; const s : storage) : bool is 
     block {
-         var balances : map(address, nat) := case Big_map.find_opt(params.token_id, s.balance) of [
+         var balances : map(address, nat) := case Map.find_opt(params.token_id, s.balance) of [
         | Some (bal) -> bal
         | None -> failwith("This NFT does not exists")
         ];
@@ -64,7 +60,7 @@ type return is list(operation) * storage;
     block {
         
         // We unpack one by one each nested map
-        var operator_rights : map(address, map(nat, bool)) := case Big_map.find_opt(Tezos.sender, s.operator_approvals) of [
+        var operator_rights : map(address, map(nat, bool)) := case Map.find_opt(Tezos.sender, s.operator_approvals) of [
         | Some (rights) -> rights
         | None -> failwith("There's no rights on this NFT")
         ];
@@ -85,7 +81,7 @@ type return is list(operation) * storage;
 function mint(const _ : unit; var s: storage) : return is 
 block {
     // On s'assure qu'il n'y ait pas un probleme au niveau de l'avancer de l'ID
-    if Big_map.mem(s.counter, s.balance) 
+    if Map.mem(s.counter, s.balance) 
     then failwith("ID already used")
     else skip;
 
@@ -115,7 +111,7 @@ block {
     var is_owner := isOwner(params, s);
 
     // On récupère le ledger pour pouvoir le modifier ensuite
-    var balances : map(address, nat) := case Big_map.find_opt(params.token_id, s.balance) of [
+    var balances : map(address, nat) := case Map.find_opt(params.token_id, s.balance) of [
         | Some (bal) -> bal
         | None -> failwith("This NFT does not exists")
     ];
@@ -148,7 +144,7 @@ block{
          params.operator -> nested_map
      ];
      
-    const added_item : operator_approvals = Map.add (Tezos.sender, operator, s.operator_approvals);
+    const added_item = Map.add(Tezos.sender, operator, s.operator_approvals);
     s.operator_approvals := added_item
     // Rétourne un booléen pour savoir si le droit existe 
     // var get_right : bool := isApprovedForAll(params, s);
@@ -165,10 +161,17 @@ block{
         operator = params._from;
         token_id = params.token_id;
     ];
+    
+    (* REGARDE LES PARAMETRES DE isApprovedForAll*)
+    
+    if isOwner(approval_params, s)  
+    then skip 
+    else if isApprovedForAll(approval_params, s) 
+    then skip 
+    else failwith("You can't send this NFT");
 
-    if Tezos.sender = params._from or isApprovedForAll(approval_params, s) then skip else failwith("You can't use this NFT");
     // On récupère le ledger pour pouvoir le modifier ensuite
-    var balances : map(address, nat) := case Big_map.find_opt(params.token_id, s.balance) of [
+    var balances : map(address, nat) := case Map.find_opt(params.token_id, s.balance) of [
     | Some (bal) -> bal
     | None -> failwith("You're trying to be send an unexisting NFT")
     ];
