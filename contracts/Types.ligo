@@ -13,6 +13,13 @@ type storage is record [
   users: big_map(id, user);
   registeredAddress: set(address);
   counter: id;
+  filesHash : map(id, string); // string = hash file
+]
+
+type risk_params is record [
+  cdi: bool;
+  salary: nat;
+  age : nat;
 ]
 
 const noOperations : list (operation) = nil;
