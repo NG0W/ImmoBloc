@@ -14,8 +14,11 @@ type storage is record [
     operator_approvals: operator_approvals;
     uris: uris;
     counter: nat;
-    agents: map(nat, )
+   // agents: map(nat, )
+   
 ]
+
+type token_metadata is map(token_id, map(string, bytes))
 
 type set_approval_params is record[
     operator: address;
