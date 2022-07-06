@@ -9,27 +9,47 @@ type uris is map(token_id, string)
 // address(=holder) -->  address(=operator) --> nat(=id nft) --> bool(=allow/deny)
 type operator_approvals is map(address, map(address, map(nat, bool)))
 
+type metadata_params is record [
+    token_id: token_id;
+    uri: string;
+    name: string;
+    symbol: string;
+    decimals: nat; 
+]
+
+type metadata is record [
+    uri: string;
+    name: string;
+    symbol: string;
+    decimals: nat; 
+]
+
+
+type token_metadata is map(token_id, metadata);
+
 type storage is record [
     balance: balance;
     operator_approvals: operator_approvals;
     uris: uris;
     counter: nat;
-   // agents: map(nat, )
+token_metadata : token_metadata;
    
 ]
 
 type token_metadata is map(token_id, map(string, bytes))
 
-type set_approval_params is record[
+type set_approval_params is record [
     operator: address;
     token_id: token_id;
 ]
 
-type transfer_from_params is record[
+type transfer_from_params is record [
     _from: address;
     _to: address;
     token_id: nat;
 ]
+
+
 
 const noOperations : list (operation) = nil;
 type return is list(operation) * storage;
@@ -80,6 +100,20 @@ type return is list(operation) * storage;
         
     }with (get_right)
 
+function setTokenMetadata(const metadata : metadata_params; var s : storage) : return is block {
+
+    const meta : metadata = record [
+        uri = metadata.uri;
+        name = metadata.name;
+        symbol = metadata.symbol;
+        decimals = metadata.decimals; 
+    ];
+
+    const new_metadata = Map.add(metadata.token_id, meta, s.token_metadata);
+    s.token_metadata := new_metadata;
+
+}with(noOperations, s)
+
 (* Update the storage at the given ID by the counter (1=owned) *)
 function mint(const _ : unit; var s: storage) : return is 
 block {
@@ -92,7 +126,7 @@ block {
      const nft : map(address, nat) = map [
          Tezos.sender -> 1n
      ];
-
+    // setTokenMetadata(metadata, s);
      // On l'ajoute au mapping balance
      s.balance[s.counter] := nft;
      s.counter := s.counter + 1n;
@@ -208,12 +242,14 @@ type action is
   | Burn of token_id
   | TransferFrom of transfer_from_params
   | SetApproval of set_approval_params
+  | SetTokenMetadata of metadata_params
 
 // Nos entrypoints
   function main(const action : action; const s : storage) : return is
   case action of [
-    | Mint     -> mint(unit, s)
+    | Mint    -> mint(unit, s)
     | Burn(id) -> burn(id, s)
     | TransferFrom(params) -> transferFrom(params, s)
     | SetApproval(params) -> setApprovalForAll(params, s)
+    | SetTokenMetadata(metadata) -> setTokenMetadata(metadata, s)
   ]
