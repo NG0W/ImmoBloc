@@ -19,7 +19,7 @@ Une fois ces 3 bases faites chacunes des parties prenantes feront monter en comp
 
 ## Compilation
 
-sudo docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:0.40.0 compile contract Main.ligo --michelson-format json > Main.json
+sudo docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:0.43.0 compile contract Main.ligo --michelson-format json > Main.json
 
 Nous resterons sur cette version par soucis de sécurité
 
@@ -32,7 +32,8 @@ RPC=https://jakartanet.tezos.marigold.dev/
 Ensuite, depuis la racine du dossier Immoblock : 
 
 ```
-ts-node deploy/deploy.ts
+ts-node deploy/deploy_Marketplace.ts 
+ts-node deploy/deploy_NFT.ts
 ```
 ## License
 
