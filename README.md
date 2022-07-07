@@ -32,7 +32,8 @@ RPC=https://jakartanet.tezos.marigold.dev/
 Ensuite, depuis la racine du dossier Immoblock : 
 
 ```
-ts-node deploy/deploy.ts
+ts-node deploy/deploy_Marketplace.ts 
+ts-node deploy/deploy_NFT.ts
 ```
 ## License
 
