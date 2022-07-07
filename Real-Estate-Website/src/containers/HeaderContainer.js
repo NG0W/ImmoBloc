@@ -44,8 +44,8 @@ const HeaderContainer = ({ bg, source }) => {
             </HeaderWrapper.List>
             <HeaderWrapper.List>
               <HeaderWrapper.Item>
-                <HeaderWrapper.Anchor to="/add-listing" special="true">
-                  Add Listing
+                <HeaderWrapper.Anchor to="/mylisting" special="true">
+                  Dashboard
                 </HeaderWrapper.Anchor>
               </HeaderWrapper.Item>
             </HeaderWrapper.List>
