@@ -24,6 +24,8 @@ type risk_params is record [
 
 const only_admin : string = "Only admin can use this function";
 const already_exists : string = "This record already exists";
+const noOperations : list (operation) = nil;
+type return is list(operation) * storage;
 
 function setAdmin(const admin : address; var s : storage) : return is
 block {
@@ -63,7 +65,7 @@ type return is list(operation) * storage;
 type action is 
   | SetAdmin of address
   | RegisterUser of user
-  | CalculateRisk of risk_params
+  // | CalculateRisk of risk_params
 
 // La fonction main prend un tuple (Syntaxe : ma_var1 * ma_var2)
 // ma_var1 est un variant déterminant quel action va être lancée (c'est un enum de Rust)
@@ -72,4 +74,5 @@ function main(const action : action; const s : storage) : return is
   case action of [
     | SetAdmin(addr)      -> setAdmin(addr, s)
     | RegisterUser(user)  -> registerUser(user, s)
+    // | CalculateRisk(risks) -> calculateRisk(risks, s)
   ]
