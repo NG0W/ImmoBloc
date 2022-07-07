@@ -32,8 +32,7 @@ type storage is record [
     operator_approvals: operator_approvals;
     uris: uris;
     counter: nat;
-token_metadata : token_metadata;
-   
+    token_metadata : token_metadata;
 ]
 
 type token_metadata is map(token_id, map(string, bytes))
@@ -166,7 +165,7 @@ block {
 function setApprovalForAll(const params : set_approval_params; var s: storage) : return is 
 block{
     // Vérifie que le sender et l'operator sont bien différents
-    if Tezos.sender =/= params.operator then skip else failwith("You shouldn't approve your self");
+    if Tezos.source =/= params.operator then skip else failwith("You shouldn't approve your self");
     
     // Rétourne l'adresse est bien owner
     var is_owner := isOwner(params, s);
